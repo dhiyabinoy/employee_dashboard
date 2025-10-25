@@ -1,0 +1,180 @@
+import os, zipfile
+
+folder_name = "employee-dashboard"
+
+files = {
+    "employee-dashboard/package.json": """{
+  "name": "employee-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.7.2",
+    "bootstrap": "^5.3.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  }
+}
+""",
+    "employee-dashboard/public/index.html": """<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Employee Dashboard</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+""",
+    "employee-dashboard/src/index.js": """import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+""",
+    "employee-dashboard/src/App.js": """import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import EmployeeDashboard from './components/EmployeeDashboard';
+import EmployeeForm from './components/EmployeeForm';
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<EmployeeDashboard />} />
+        <Route path="/employee-form" element={<EmployeeForm />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+""",
+    "employee-dashboard/src/components/Navbar.js": """import React from 'react';
+import { Link } from 'react-router-dom';
+
+function Navbar() {
+  return (
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+      <Link className="navbar-brand" to="/">Employee Dashboard</Link>
+      <div className="collapse navbar-collapse">
+        <ul className="navbar-nav ms-auto">
+          <li className="nav-item">
+            <Link className="nav-link" to="/">Home</Link>
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/employee-form">Employee Form</Link>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+""",
+    "employee-dashboard/src/components/EmployeeDashboard.js": """import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+function EmployeeDashboard() {
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    axios.get('https://jsonplaceholder.typicode.com/users')
+      .then(res => setEmployees(res.data))
+      .catch(err => console.error('Error fetching employee data:', err));
+  }, []);
+
+  return (
+    <div className="container mt-4">
+      <h2 className="mb-3">Employee Dashboard</h2>
+      <table className="table table-striped">
+        <thead className="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map(emp => (
+            <tr key={emp.id}>
+              <td>{emp.id}</td>
+              <td>{emp.name}</td>
+              <td>{emp.email}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default EmployeeDashboard;
+""",
+    "employee-dashboard/src/components/EmployeeForm.js": """import React, { useState } from 'react';
+
+function EmployeeForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    designation: '',
+    location: '',
+    salary: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Employee Form Data:', formData);
+    alert('Form submitted successfully! (Check console for data)');
+  };
+
+  return (
+    <div className="container mt-4">
+      <h2>Employee Form</h2>
+      <form className="mt-3" onSubmit={handleSubmit}>
+        <div className="mb-3">
+          <label className="form-label">Name</label>
+          <input className="form-control" name="name" onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Designation</label>
+          <input className="form-control" name="designation" onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Location</label>
+          <input className="form-control" name="location" onChange={handleChange} required />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Salary</label>
+          <input className="form-control" type="number" name="salary" onChange={handleChange} required />
+        </div>
+        <button type="submit" className="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  );
+}
+
+export default EmployeeForm;
+"""
+}
+
